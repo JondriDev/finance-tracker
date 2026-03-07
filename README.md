@@ -42,3 +42,4 @@ Or view the live version: [jondridev.github.io/finance-tracker](https://jondride
 
 Built by [JondriDev](https://github.com/JondriDev) — Day 6 of a 365-day journey to become a remote developer.
 
+
