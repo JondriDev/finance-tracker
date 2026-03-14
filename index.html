@@ -177,7 +177,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
         </div>
         <div class="form-group">
           <label id="uiAmt">Amount (IDR)</label>
-          <input type="number" class="input" id="amount" placeholder="150000" min="1" required>
+          <input type="text" inputmode="numeric" class="input" id="amount" placeholder="150.000" required>
         </div>
         <div class="form-group">
           <label id="uiDate">Date</label>
@@ -240,7 +240,6 @@ let currentUser = null;
 let balance = 0, pendingType = null, currentFilter = 'all', editingId = null;
 let chart = null, authMode = 'login', authLoading = false;
 
-// ADDED INITIAL BALANCE AND ADJUSTMENT TO CATEGORIES
 const categories = {
   income: ['Initial Balance', 'Salary', 'Freelance', 'Gift', 'Investment', 'Other'],
   expense: ['Adjustment', 'Food', 'Wifi', 'Transportation', 'Electricity', 'Skincare', 'Other']
@@ -274,6 +273,18 @@ const UI = {
     welcome: 'Selamat datang', logoutBtn: 'Keluar'
   }
 };
+
+/* ══ AUTO FORMAT INPUT ═════════════════════════════ */
+document.getElementById('amount').addEventListener('input', function(e) {
+  // Remove anything that isn't a number
+  let val = this.value.replace(/\D/g, '');
+  if (val) {
+    // Format with periods for Indonesian locale styling
+    this.value = parseInt(val, 10).toLocaleString('id-ID');
+  } else {
+    this.value = '';
+  }
+});
 
 /* ══ LANGUAGE & THEME ══════════════════════════════ */
 function setLang(l) { lang = l; localStorage.setItem('finance_lang', l); applyLang(); updateDisplay(); }
@@ -435,7 +446,6 @@ function handleButtonClick(type) {
   document.getElementById('categoryLabel').textContent = UI[lang][type==='income'?'catInc':'catExp'];
   const catSelect = document.getElementById('category');
   
-  // Automatically switch categories to English or Indonesian representation in UI
   const isID = lang === 'id';
   catSelect.innerHTML = '<option value="">Select...</option>' + categories[type].map(c => {
       let displayName = c;
@@ -450,11 +460,12 @@ function handleButtonClick(type) {
 
 async function saveTransaction() {
   const desc = document.getElementById('description').value;
-  const amt = parseFloat(document.getElementById('amount').value);
+  // Strip out non-digit characters before parsing
+  const rawAmtStr = document.getElementById('amount').value.replace(/\D/g, '');
+  const amt = parseFloat(rawAmtStr);
   const date = document.getElementById('date').value;
   const cat = document.getElementById('category').value;
   
-  // BUG FIX: Prevent negative amounts or 0
   if (!desc || isNaN(amt) || amt <= 0 || !cat || !date || !pendingType) {
       showToast(UI[lang].toastFill);
       return;
@@ -488,7 +499,8 @@ function editTransaction(id) {
   const t = transactions.find(t => t.id === id); if (!t) return;
   editingId = id;
   document.getElementById('description').value = t.description;
-  document.getElementById('amount').value = t.amount;
+  // Format the existing number so it looks right when editing
+  document.getElementById('amount').value = t.amount.toLocaleString('id-ID');
   document.getElementById('date').value = t.date;
   handleButtonClick(t.type);
   document.getElementById('category').value = t.category;
@@ -563,7 +575,6 @@ function updateChart(filtered, t) {
   const ctx = document.getElementById('spendingChart').getContext('2d');
   const empty = document.getElementById('chartEmptyState');
   
-  // Filter out Initial Balance and Adjustment for the chart rendering only
   const chartData = filtered.filter(tx => tx.category !== 'Initial Balance' && tx.category !== 'Adjustment');
   
   if (!chartData.length) { document.getElementById('spendingChart').style.display = 'none'; empty.textContent = t.emptyCh; empty.style.display = 'block'; return; }
@@ -576,7 +587,6 @@ function updateChart(filtered, t) {
   });
   const cats = [...new Set([...Object.keys(incData), ...Object.keys(expData)])];
   
-  // Translate labels for the chart if in ID mode
   const displayCats = cats.map(c => {
       if(lang === 'id' && c === 'Initial Balance') return 'Saldo Awal';
       if(lang === 'id' && c === 'Adjustment') return 'Penyesuaian';
