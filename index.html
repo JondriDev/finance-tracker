@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="theme-color" content="#fdf0f8" media="(prefers-color-scheme: light)"/>
+<meta name="theme-color" content="#080610" media="(prefers-color-scheme: dark)"/>
+<link rel="manifest" href="manifest.json">
+<title>Vocab · JondriDev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --brand:#f472b6;--brand2:#e879f9;--brand3:#c084fc;
+  --success:#4ade80;--warn:#fbbf24;--danger:#f87171;--info:#38bdf8;
+  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:26px;--r-2xl:32px;--r-3xl:40px;--r-full:9999px;
+  --nav-h:56px;--bnav-h:72px;
+}
+[data-theme="light"]{
+  --bg:#fdf0f8;--text:#1a0a14;--text2:#6b2d50;--text3:#b07090;--inv:#1a0a14;
+  --lg-bg:rgba(255,255,255,0.42);--lg-bg-h:rgba(255,255,255,0.60);
+  --lg-bg-s:rgba(255,255,255,0.68);--lg-bg-nav:rgba(255,255,255,0.55);
+  --lg-b:rgba(255,255,255,0.78);--lg-b2:rgba(255,255,255,0.92);
+  --lg-sh:0 2px 20px rgba(180,80,140,0.09),0 1px 3px rgba(180,80,140,0.07);
+  --lg-sh2:0 8px 40px rgba(180,80,140,0.13),0 2px 8px rgba(180,80,140,0.09);
+  --lg-sh3:0 20px 60px rgba(180,80,140,0.18),0 4px 16px rgba(180,80,140,0.12);
+  --lg-spec:rgba(255,255,255,0.92);
+  --grad:
+    radial-gradient(ellipse 90% 70% at 5% 5%,rgba(244,114,182,0.35) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 60% at 95% 10%,rgba(192,132,252,0.30) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 80% at 60% 90%,rgba(232,121,249,0.22) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 50% at 10% 80%,rgba(251,191,36,0.15) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 60% at 85% 70%,rgba(56,189,248,0.12) 0%,transparent 50%),
+    #fdf0f8;
+}
+[data-theme="dark"]{
+  --bg:#080610;--text:#f5eeff;--text2:#b07090;--text3:#6b2d50;--inv:#080610;
+  --lg-bg:rgba(40,10,30,0.50);--lg-bg-h:rgba(60,15,45,0.60);
+  --lg-bg-s:rgba(70,20,55,0.65);--lg-bg-nav:rgba(20,5,15,0.75);
+  --lg-b:rgba(244,114,182,0.12);--lg-b2:rgba(244,114,182,0.22);
+  --lg-sh:0 2px 20px rgba(0,0,20,0.50),0 1px 3px rgba(0,0,20,0.35);
+  --lg-sh2:0 8px 40px rgba(0,0,20,0.65),0 2px 8px rgba(0,0,20,0.45);
+  --lg-sh3:0 20px 60px rgba(0,0,20,0.80),0 4px 16px rgba(0,0,20,0.60);
+  --lg-spec:rgba(244,114,182,0.10);
+  --grad:
+    radial-gradient(ellipse 90% 70% at 5% 5%,rgba(244,114,182,0.12) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 60% at 95% 10%,rgba(192,132,252,0.10) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 80% at 60% 90%,rgba(232,121,249,0.08) 0%,transparent 55%),
+    #080610;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  font-family:var(--font);
+  background:var(--grad);
+  background-attachment:fixed;
+  color:var(--text);
+  min-height:100vh;min-height:100dvh;
+  transition:background 0.5s,color 0.3s;
+  padding-bottom:calc(var(--bnav-h) + env(safe-area-inset-bottom,0px));
+  overflow-x:hidden;
+}
+
+/* LIQUID GLASS */
+.lg{
+  background:var(--lg-bg);
+  backdrop-filter:blur(32px) saturate(200%);
+  -webkit-backdrop-filter:blur(32px) saturate(200%);
+  border:1px solid var(--lg-b);
+  box-shadow:var(--lg-sh);
+  position:relative;isolation:isolate;
+}
+.lg::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.lg>*{position:relative;z-index:1;}
+.lg2{
+  background:var(--lg-bg-s);
+  backdrop-filter:blur(48px) saturate(220%);
+  -webkit-backdrop-filter:blur(48px) saturate(220%);
+  border:1px solid var(--lg-b2);
+  box-shadow:var(--lg-sh2);
+  position:relative;isolation:isolate;
+}
+.lg2::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 40%);pointer-events:none;z-index:0;}
+.lg2>*{position:relative;z-index:1;}
+
+/* NAVBAR */
+.navbar{
+  position:sticky;top:0;z-index:500;
+  height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(12px,4vw,24px);gap:8px;
+  background:var(--lg-bg-nav);
+  backdrop-filter:blur(48px) saturate(200%);
+  -webkit-backdrop-filter:blur(48px) saturate(200%);
+  border-bottom:1px solid var(--lg-b);
+  box-shadow:0 1px 24px rgba(180,80,140,0.08);
+}
+.logo{
+  font-weight:900;font-size:clamp(14px,3.5vw,17px);letter-spacing:-0.03em;
+  background:linear-gradient(135deg,var(--brand),var(--brand3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  white-space:nowrap;
+}
+.logo-badge{
+  display:inline-flex;align-items:center;
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);
+  background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.25);
+  color:var(--brand);font-family:var(--mono);letter-spacing:0.08em;
+  margin-left:6px;vertical-align:middle;-webkit-text-fill-color:var(--brand);
+}
+.nav-right{display:flex;align-items:center;gap:6px;}
+.lang-toggle{display:flex;border-radius:var(--r-full);overflow:hidden;border:1px solid var(--lg-b2);background:var(--lg-bg);backdrop-filter:blur(20px);}
+.lang-btn{font-family:var(--font);font-size:10px;font-weight:800;padding:5px 10px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;}
+.lang-btn.active{background:linear-gradient(135deg,var(--brand),var(--brand3));color:white;}
+.toggle{width:44px;height:24px;border-radius:var(--r-full);background:var(--lg-bg);border:1px solid var(--lg-b);backdrop-filter:blur(20px);cursor:pointer;position:relative;transition:all 0.3s;flex-shrink:0;}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand3));transition:all 0.3s;box-shadow:0 0 10px rgba(244,114,182,0.5);}
+[data-theme="dark"] .toggle::after{transform:translateX(20px);}
+
+/* PAGES */
+.page{display:none;animation:fadeIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* INNER */
+.inner{max-width:640px;margin:0 auto;padding:0 clamp(12px,4vw,20px);}
+.page-pad{padding:clamp(16px,4vw,28px) 0;}
+
+/* SECTION LABEL */
+.sec-label{font-family:var(--mono);font-size:clamp(9px,2vw,11px);font-weight:700;letter-spacing:0.28em;color:var(--text3);margin-bottom:10px;text-transform:uppercase;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:clamp(14px,4vw,20px);}
+.stat-card{border-radius:var(--r-xl);padding:clamp(14px,4vw,20px);text-align:center;}
+.stat-val{font-family:var(--mono);font-size:clamp(1.4rem,5vw,2rem);font-weight:700;margin-bottom:4px;}
+.stat-lbl{font-size:clamp(9px,2.5vw,11px);color:var(--text2);font-weight:600;letter-spacing:0.05em;}
+
+/* STREAK BANNER */
+.streak-banner{
+  border-radius:var(--r-2xl);padding:clamp(18px,5vw,26px) clamp(16px,5vw,24px);
+  margin-bottom:clamp(14px,4vw,20px);
+  background:linear-gradient(135deg,rgba(244,114,182,0.12),rgba(192,132,252,0.12));
+  border:1px solid rgba(244,114,182,0.22);
+  display:flex;align-items:center;gap:clamp(12px,3vw,18px);
+}
+.streak-num{font-family:var(--mono);font-size:clamp(2.5rem,9vw,4rem);font-weight:700;color:var(--brand);line-height:1;}
+.streak-info{}
+.streak-title{font-size:clamp(14px,4vw,18px);font-weight:800;margin-bottom:4px;}
+.streak-sub{font-size:clamp(11px,2.5vw,13px);color:var(--text2);}
+
+/* DUE CARD */
+.due-card{
+  border-radius:var(--r-2xl);padding:clamp(16px,4vw,22px);
+  margin-bottom:clamp(14px,4vw,20px);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.due-info{}
+.due-count{font-family:var(--mono);font-size:clamp(1.8rem,6vw,2.5rem);font-weight:700;color:var(--brand);line-height:1;margin-bottom:4px;}
+.due-lbl{font-size:clamp(12px,3vw,14px);font-weight:700;margin-bottom:2px;}
+.due-sub{font-size:clamp(10px,2.5vw,12px);color:var(--text2);}
+.study-btn{
+  flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand),var(--brand3));
+  border:none;border-radius:var(--r-xl);
+  padding:clamp(12px,3vw,16px) clamp(16px,4vw,24px);
+  color:white;font-family:var(--font);font-size:clamp(12px,3vw,14px);font-weight:800;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(244,114,182,0.35);
+}
+.study-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(244,114,182,0.50);}
+.study-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+
+/* LIBRARY */
+.word-item{
+  display:flex;align-items:center;gap:12px;
+  padding:clamp(10px,3vw,14px) clamp(12px,3vw,16px);
+  border-radius:var(--r-lg);margin-bottom:6px;transition:all 0.2s;
+}
+.word-item:hover{background:var(--lg-bg-h);}
+.word-left{flex:1;min-width:0;}
+.word-txt{font-weight:800;font-size:clamp(13px,3.5vw,15px);margin-bottom:2px;}
+.word-ph{font-family:'Segoe UI',system-ui;font-size:clamp(10px,2.5vw,12px);color:var(--brand);margin-bottom:2px;}
+.word-def{font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.word-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.interval-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  padding:2px 8px;border-radius:var(--r-full);
+  background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.25);
+  color:var(--brand);
+}
+.due-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  padding:2px 8px;border-radius:var(--r-full);
+  background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);
+  color:var(--warn);
+}
+.new-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  padding:2px 8px;border-radius:var(--r-full);
+  background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);
+  color:var(--info);
+}
+
+/* QUIZ */
+.quiz-wrap{max-width:560px;margin:0 auto;padding:0 clamp(12px,4vw,20px) clamp(20px,5vw,32px);}
+.quiz-progress{margin-bottom:clamp(14px,4vw,20px);}
+.progress-track{height:5px;background:var(--lg-bg);border-radius:3px;overflow:hidden;margin-top:6px;}
+.progress-fill{height:100%;background:linear-gradient(to right,var(--brand),var(--brand3));border-radius:3px;transition:width 0.4s ease;}
+.quiz-card{
+  border-radius:var(--r-3xl);padding:clamp(20px,6vw,36px);
+  margin-bottom:clamp(14px,4vw,20px);text-align:center;
+}
+.quiz-word{
+  font-size:clamp(2rem,8vw,3.5rem);font-weight:900;letter-spacing:-0.04em;
+  background:linear-gradient(135deg,var(--brand),var(--brand3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;line-height:1.1;
+}
+.quiz-ph{font-family:'Segoe UI',system-ui;font-size:clamp(12px,3vw,15px);color:var(--brand);margin-bottom:6px;}
+.quiz-pos{
+  display:inline-block;
+  font-family:var(--mono);font-size:clamp(9px,2vw,11px);font-weight:700;
+  padding:3px 10px;border-radius:var(--r-full);
+  background:rgba(244,114,182,0.12);border:1px solid rgba(244,114,182,0.25);
+  color:var(--brand);letter-spacing:0.08em;
+}
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:clamp(14px,4vw,20px);}
+.option-btn{
+  width:100%;text-align:left;
+  font-family:var(--font);font-size:clamp(12px,3vw,14px);font-weight:600;
+  padding:clamp(12px,3.5vw,16px) clamp(14px,4vw,20px);
+  border-radius:var(--r-xl);cursor:pointer;transition:all 0.2s;
+  line-height:1.5;
+}
+.option-btn:hover:not(:disabled){transform:translateX(4px);border-color:rgba(244,114,182,0.50)!important;}
+.option-btn.correct{background:rgba(74,222,128,0.15)!important;border-color:rgba(74,222,128,0.50)!important;color:var(--success)!important;}
+.option-btn.wrong{background:rgba(248,113,113,0.12)!important;border-color:rgba(248,113,113,0.35)!important;color:var(--danger)!important;}
+
+/* RATING SECTION */
+.rating-wrap{display:none;text-align:center;margin-bottom:clamp(14px,4vw,20px);}
+.rating-title{font-size:clamp(12px,3vw,14px);font-weight:700;margin-bottom:12px;color:var(--text2);}
+.rating-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.rating-btn{
+  font-family:var(--font);font-size:clamp(11px,2.5vw,13px);font-weight:700;
+  padding:8px 16px;border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s;border:none;
+}
+
+/* QUIZ COMPLETE */
+.quiz-complete{text-align:center;padding:clamp(24px,6vw,48px) clamp(16px,5vw,32px);}
+.complete-emoji{font-size:clamp(48px,12vw,72px);margin-bottom:16px;}
+.complete-title{font-size:clamp(1.3rem,5vw,1.8rem);font-weight:900;margin-bottom:8px;}
+.complete-sub{font-size:clamp(12px,3vw,14px);color:var(--text2);margin-bottom:clamp(16px,4vw,24px);line-height:1.6;}
+.complete-stats{display:flex;justify-content:center;gap:clamp(16px,5vw,32px);margin-bottom:clamp(20px,5vw,32px);}
+.c-stat-val{font-family:var(--mono);font-size:clamp(1.5rem,6vw,2.2rem);font-weight:700;color:var(--brand);}
+.c-stat-lbl{font-size:clamp(10px,2.5vw,12px);color:var(--text2);margin-top:2px;}
+
+/* EMPTY STATES */
+.empty{text-align:center;padding:clamp(24px,6vw,48px) 14px;color:var(--text3);}
+.empty-icon{font-size:clamp(36px,10vw,52px);margin-bottom:14px;}
+.empty-title{font-size:clamp(14px,4vw,17px);font-weight:800;margin-bottom:8px;color:var(--text2);}
+.empty-sub{font-size:clamp(11px,3vw,13px);line-height:1.7;}
+
+/* SKELETON */
+.skeleton{border-radius:var(--r-md);animation:shimmer 1.5s infinite;}
+@keyframes shimmer{0%,100%{background:var(--lg-bg);}50%{background:var(--lg-bg-h);}}
+
+/* PROFILE */
+.profile-wrap{max-width:560px;margin:0 auto;padding:clamp(16px,4vw,24px) clamp(12px,4vw,20px);}
+.profile-avatar{
+  width:clamp(60px,16vw,80px);height:clamp(60px,16vw,80px);border-radius:50%;
+  background:linear-gradient(135deg,rgba(244,114,182,0.3),rgba(192,132,252,0.3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(24px,7vw,32px);margin:0 auto clamp(10px,3vw,14px);
+  border:2px solid var(--lg-b2);
+}
+.profile-name{font-size:clamp(1.1rem,5vw,1.4rem);font-weight:900;text-align:center;margin-bottom:4px;}
+.profile-email{font-size:clamp(11px,3vw,13px);color:var(--text2);text-align:center;margin-bottom:clamp(16px,4vw,22px);font-family:var(--mono);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:clamp(12px,3vw,16px);border-radius:var(--r-xl);margin-bottom:8px;}
+.setting-label{font-size:clamp(12px,3vw,14px);font-weight:700;margin-bottom:2px;}
+.setting-desc{font-size:clamp(10px,2.5vw,12px);color:var(--text2);}
+.eco-chip{display:inline-flex;align-items:center;gap:5px;font-size:clamp(10px,2.5vw,12px);font-weight:700;padding:5px 12px;border-radius:var(--r-full);border:1px solid;margin:3px;transition:all 0.2s;}
+.eco-chip:hover{transform:translateY(-1px);}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:calc(var(--bnav-h) + 10px + env(safe-area-inset-bottom,0px));
+  left:50%;transform:translateX(-50%) translateY(16px);
+  padding:10px 20px;border-radius:var(--r-full);font-size:clamp(12px,3vw,14px);font-weight:700;
+  z-index:900;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;
+  max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:400;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:8px clamp(8px,3vw,16px) calc(12px + env(safe-area-inset-bottom,0px));
+  height:calc(var(--bnav-h) + env(safe-area-inset-bottom,0px));
+  background:var(--lg-bg-nav);
+  backdrop-filter:blur(48px) saturate(200%);
+  -webkit-backdrop-filter:blur(48px) saturate(200%);
+  border-top:1px solid var(--lg-b);
+  box-shadow:0 -4px 32px rgba(180,80,140,0.08);
+}
+.bnav-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;border:none;background:transparent;font-family:var(--font);
+  padding:5px clamp(10px,3vw,16px);border-radius:var(--r-lg);transition:all 0.2s;
+  min-width:0;
+}
+.bnav-item span:first-child{font-size:clamp(18px,5vw,22px);}
+.bnav-item span:last-child{font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--text3);letter-spacing:0.04em;transition:color 0.2s;white-space:nowrap;}
+.bnav-item.active span:last-child{color:var(--brand);}
+.bnav-item:hover{background:var(--lg-bg);}
+
+/* AUTH */
+.auth-wrap{max-width:400px;margin:0 auto;padding:clamp(16px,5vw,32px) clamp(12px,4vw,20px);}
+.auth-title{font-size:clamp(1.3rem,5vw,1.7rem);font-weight:900;text-align:center;margin-bottom:4px;}
+.auth-sub{font-size:clamp(12px,3vw,14px);color:var(--text2);text-align:center;margin-bottom:clamp(16px,4vw,22px);}
+.auth-tabs{display:flex;border-radius:var(--r-full);overflow:hidden;border:1px solid var(--lg-b2);margin-bottom:clamp(14px,4vw,20px);}
+.auth-tab{flex:1;text-align:center;padding:9px;font-size:12px;font-weight:800;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:var(--font);transition:all 0.2s;}
+.auth-tab.active{background:linear-gradient(135deg,var(--brand),var(--brand3));color:white;}
+.google-btn{width:100%;font-family:var(--font);font-size:13px;font-weight:700;background:var(--lg-bg);border:1px solid var(--lg-b);border-radius:var(--r-lg);padding:12px;color:var(--text);cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(20px);transition:all 0.2s;}
+.google-btn:hover{background:var(--lg-bg-h);transform:translateY(-1px);}
+.google-icon{width:18px;height:18px;}
+.auth-divider{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.auth-divider-line{flex:1;height:1px;background:var(--lg-b);}
+.auth-divider-txt{font-family:var(--mono);font-size:10px;color:var(--text3);font-weight:700;}
+.auth-input{width:100%;font-family:var(--font);font-size:14px;background:var(--lg-bg);backdrop-filter:blur(20px);border:1px solid var(--lg-b);border-radius:var(--r-md);padding:12px 16px;color:var(--text);outline:none;transition:all 0.2s;margin-bottom:10px;}
+.auth-input::placeholder{color:var(--text3);}
+.auth-input:focus{border-color:rgba(244,114,182,0.50);box-shadow:0 0 0 3px rgba(244,114,182,0.12);}
+.auth-btn{width:100%;font-family:var(--font);font-size:14px;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--brand3));border:none;border-radius:var(--r-lg);padding:13px;color:white;cursor:pointer;transition:all 0.2s;margin-bottom:12px;box-shadow:0 4px 20px rgba(244,114,182,0.30);}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(244,114,182,0.45);}
+.auth-error{font-size:12px;color:var(--danger);margin-bottom:10px;padding:8px 12px;background:rgba(248,113,113,0.10);border-radius:var(--r-sm);border:1px solid rgba(248,113,113,0.20);display:none;}
+.auth-note{font-size:12px;color:var(--text2);text-align:center;}
+.auth-note a{color:var(--brand);cursor:pointer;font-weight:700;-webkit-text-fill-color:var(--brand);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--lg-b2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div style="display:flex;align-items:center">
+    <div class="logo">Vocab</div>
+    <span class="logo-badge">v1</span>
+  </div>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="langEN" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="langID" onclick="setLang('id')">ID</button>
+    </div>
+    <button class="toggle" onclick="toggleTheme()"></button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="pageHome">
+  <div class="inner">
+    <div class="page-pad">
+      <div id="homeContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIBRARY PAGE -->
+<div class="page" id="pageLibrary">
+  <div class="inner">
+    <div class="page-pad">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:clamp(14px,4vw,20px)">
+        <div>
+          <div style="font-size:clamp(1.2rem,5vw,1.5rem);font-weight:900;margin-bottom:4px" id="libraryTitle">Word Library</div>
+          <div class="sec-label" id="librarySubLbl">ALL YOUR SAVED WORDS</div>
+        </div>
+        <button onclick="syncFromKamus()" style="font-family:var(--font);font-size:11px;font-weight:700;background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.25);border-radius:var(--r-full);padding:6px 14px;color:var(--brand);cursor:pointer;transition:all 0.2s;" id="syncBtn">↻ Sync</button>
+      </div>
+      <div id="libraryList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page" id="pageQuiz">
+  <div class="quiz-wrap">
+    <div class="page-pad">
+      <div id="quizContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="pageProfile">
+  <div id="profileContent"></div>
+</div>
+
+<div class="toast lg2" id="toast"></div>
+
+<nav class="bottom-nav">
+  <button class="bnav-item active" id="bnav0" onclick="gotoPage('Home',0)">
+    <span>🏠</span><span id="nav0lbl">Home</span>
+  </button>
+  <button class="bnav-item" id="bnav1" onclick="gotoPage('Library',1)">
+    <span>📚</span><span id="nav1lbl">Library</span>
+  </button>
+  <button class="bnav-item" id="bnav2" onclick="gotoPage('Quiz',2)">
+    <span>🧠</span><span id="nav2lbl">Quiz</span>
+  </button>
+  <button class="bnav-item" id="bnav3" onclick="gotoPage('Profile',3)">
+    <span>👤</span><span id="nav3lbl">Profile</span>
+  </button>
+</nav>
+
+<script>
+/* ══ SUPABASE ═══════════════════════════════════════ */
+const SUPA_URL='https://dvvucxqszyupeykdwoev.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2dnVjeHFzenl1cGV5a2R3b2V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjk2NTQsImV4cCI6MjA4OTAwNTY1NH0.HWrP5_3iNRknlMtjjKszedxKU5Q6NLAIEWuD-J4Yqp0';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true}});
+
+/* ══ STATE ══════════════════════════════════════════ */
+let lang=localStorage.getItem('vocab_lang')||'en';
+let currentUser=null;
+let vocabWords=[]; // from vocab_progress
+let quizQueue=[];
+let quizIndex=0;
+let quizScore=0;
+let quizTotal=0;
+let quizAnswered=false;
+let authMode='login';
+let authLoading=false;
+
+/* ══ I18N ═══════════════════════════════════════════ */
+const UI={
+  en:{
+    nav0:'Home',nav1:'Library',nav2:'Quiz',nav3:'Profile',
+    streakLbl:'Day Streak',streakSub:'Keep it up! Study daily.',
+    dueTitle:'Words Due Today',dueSub:'Ready for review',
+    studyBtn:'Study Now',noStudy:'All caught up!',
+    statTotal:'Total Words',statMastered:'Mastered',statDue:'Due Today',statStreak:'Streak',
+    libTitle:'Word Library',libSub:'ALL YOUR SAVED WORDS',
+    syncBtn:'↻ Sync',syncing:'Syncing...',
+    syncDone:(n)=>`${n} new word${n!==1?'s':''} added`,
+    syncNone:'Already up to date',
+    syncLogin:'Sign in to sync from Kamus',
+    noWords:'No words yet',noWordsSub:'Sign in and sync from Kamus to get started.',
+    quizTitle:'Quiz',quizSub:'Test your knowledge',
+    noQuiz:'No words due',noQuizSub:'All words reviewed! Come back tomorrow.',
+    questionOf:(i,t)=>`Question ${i} of ${t}`,
+    rateTitle:'How well did you remember?',
+    rateBlackout:'Blackout',rateHard:'Hard',rateGood:'Good',rateEasy:'Easy',
+    quizDone:'Session Complete!',
+    quizDoneSub:(s,t)=>`You got ${s} out of ${t} correct.`,
+    again:'Study Again',backHome:'Back to Home',
+    loginTitle:'Welcome to Vocab',loginSub:'Sign in to sync your saved words from Kamus.',
+    signupTitle:'Create Account',signupSub:'Start your vocabulary journey.',
+    loginTab:'Sign In',signupTab:'Sign Up',
+    googleBtn:'Continue with Google',
+    emailPH:'Email address',passPH:'Password',namePH:'Your name',
+    loginBtn:'Sign In',signupBtn:'Create Account',
+    loginNote:"Don't have an account?",signupNote:'Already have an account?',
+    logoutBtn:'Sign Out',
+    settingsLabel:'Settings',settingLangLbl:'Language',settingLangDesc:'App display language',
+    settingThemeLbl:'Dark Mode',settingThemeDesc:'Toggle light/dark theme',
+    ecoLabel:'Ecosystem',ecoDesc:'All apps share one account.',
+    cloudSynced:'Synced',profileTitle:'Profile',
+    newBadge:'NEW',dueBadgeF:(d)=>`Due ${d}`,intervalF:(d)=>`${d}d`,
+    masteredBadge:'✓ Mastered',
+  },
+  id:{
+    nav0:'Beranda',nav1:'Perpustakaan',nav2:'Kuis',nav3:'Profil',
+    streakLbl:'Hari Berturut',streakSub:'Pertahankan! Belajar setiap hari.',
+    dueTitle:'Kata Untuk Hari Ini',dueSub:'Siap untuk ditinjau',
+    studyBtn:'Mulai Belajar',noStudy:'Semua selesai!',
+    statTotal:'Total Kata',statMastered:'Dikuasai',statDue:'Jatuh Tempo',statStreak:'Streak',
+    libTitle:'Perpustakaan Kata',libSub:'SEMUA KATA TERSIMPAN',
+    syncBtn:'↻ Sinkron',syncing:'Menyinkron...',
+    syncDone:(n)=>`${n} kata baru ditambahkan`,
+    syncNone:'Sudah terkini',
+    syncLogin:'Masuk untuk sinkron dari Kamus',
+    noWords:'Belum ada kata',noWordsSub:'Masuk dan sinkron dari Kamus untuk memulai.',
+    quizTitle:'Kuis',quizSub:'Uji pengetahuanmu',
+    noQuiz:'Tidak ada kata jatuh tempo',noQuizSub:'Semua kata sudah ditinjau! Kembali besok.',
+    questionOf:(i,t)=>`Soal ${i} dari ${t}`,
+    rateTitle:'Seberapa baik kamu ingat?',
+    rateBlackout:'Lupa',rateHard:'Sulit',rateGood:'Ingat',rateEasy:'Mudah',
+    quizDone:'Sesi Selesai!',
+    quizDoneSub:(s,t)=>`Kamu menjawab ${s} dari ${t} benar.`,
+    again:'Belajar Lagi',backHome:'Kembali ke Beranda',
+    loginTitle:'Selamat Datang',loginSub:'Masuk untuk sinkron kata dari Kamus.',
+    signupTitle:'Buat Akun',signupSub:'Mulai perjalanan kosakatamu.',
+    loginTab:'Masuk',signupTab:'Daftar',
+    googleBtn:'Lanjutkan dengan Google',
+    emailPH:'Alamat email',passPH:'Kata sandi',namePH:'Nama kamu',
+    loginBtn:'Masuk',signupBtn:'Buat Akun',
+    loginNote:'Belum punya akun?',signupNote:'Sudah punya akun?',
+    logoutBtn:'Keluar',
+    settingsLabel:'Pengaturan',settingLangLbl:'Bahasa',settingLangDesc:'Bahasa tampilan aplikasi',
+    settingThemeLbl:'Mode Gelap',settingThemeDesc:'Ganti tema terang/gelap',
+    ecoLabel:'Ekosistem',ecoDesc:'Semua app berbagi satu akun.',
+    cloudSynced:'Tersinkron',profileTitle:'Profil',
+    newBadge:'BARU',dueBadgeF:(d)=>`Jatuh ${d}`,intervalF:(d)=>`${d}h`,
+    masteredBadge:'✓ Dikuasai',
+  }
+};
+
+/* ══ THEME & LANG ═══════════════════════════════════ */
+function toggleTheme(){
+  const h=document.documentElement;
+  const isDark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',isDark?'light':'dark');
+  localStorage.setItem('vocab_theme',isDark?'light':'dark');
+}
+function setLang(l){
+  lang=l;
+  localStorage.setItem('vocab_lang',l);
+  document.getElementById('langEN').classList.toggle('active',l==='en');
+  document.getElementById('langID').classList.toggle('active',l==='id');
+  applyLang();
+  renderCurrentPage();
+}
+function applyLang(){
+  const t=UI[lang];
+  ['0','1','2','3'].forEach(i=>{ const el=document.getElementById('nav'+i+'lbl'); if(el) el.textContent=t['nav'+i]; });
+  const lb=document.getElementById('libraryTitle');if(lb)lb.textContent=t.libTitle;
+  const ls=document.getElementById('librarySubLbl');if(ls)ls.textContent=t.libSub;
+  const sb=document.getElementById('syncBtn');if(sb)sb.textContent=t.syncBtn;
+}
+
+/* ══ NAV ════════════════════════════════════════════ */
+let currentPage='Home';
+function gotoPage(name,idx){
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+name).classList.add('active');
+  document.querySelectorAll('.bnav-item').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  renderCurrentPage();
+}
+function renderCurrentPage(){
+  if(currentPage==='Home') renderHome();
+  else if(currentPage==='Library') renderLibrary();
+  else if(currentPage==='Quiz') renderQuizPage();
+  else if(currentPage==='Profile') renderProfile();
+}
+
+/* ══ SM-2 ALGORITHM ═════════════════════════════════ */
+// quality: 0=blackout,1=hard,2=hard2,3=good,4=easy,5=perfect
+function sm2(word, quality){
+  let {ease_factor,interval_days,repetitions}=word;
+  if(quality<3){
+    repetitions=0;
+    interval_days=1;
+  } else {
+    if(repetitions===0) interval_days=1;
+    else if(repetitions===1) interval_days=6;
+    else interval_days=Math.round(interval_days*ease_factor);
+    repetitions++;
+    ease_factor=ease_factor+(0.1-(5-quality)*(0.08+(5-quality)*0.02));
+    if(ease_factor<1.3) ease_factor=1.3;
+  }
+  const next=new Date();
+  next.setDate(next.getDate()+interval_days);
+  return{
+    ease_factor:parseFloat(ease_factor.toFixed(2)),
+    interval_days,
+    repetitions,
+    next_review:next.toISOString().split('T')[0],
+    total_reviews:(word.total_reviews||0)+1
+  };
+}
+function isDue(word){
+  const today=new Date().toISOString().split('T')[0];
+  return word.next_review<=today;
+}
+function isMastered(word){ return word.repetitions>=4 && word.interval_days>=21; }
+
+/* ══ STREAK ════════════════════════════════════════ */
+function getStreak(){
+  const data=JSON.parse(localStorage.getItem('vocab_streak_data')||'{"streak":0,"lastDate":""}');
+  const today=new Date().toISOString().split('T')[0];
+  if(data.lastDate===today) return data.streak;
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const yStr=yesterday.toISOString().split('T')[0];
+  if(data.lastDate===yStr) return data.streak;
+  return 0;
+}
+function markStudiedToday(){
+  const today=new Date().toISOString().split('T')[0];
+  const data=JSON.parse(localStorage.getItem('vocab_streak_data')||'{"streak":0,"lastDate":""}');
+  if(data.lastDate===today) return;
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const yStr=yesterday.toISOString().split('T')[0];
+  const newStreak=data.lastDate===yStr?data.streak+1:1;
+  localStorage.setItem('vocab_streak_data',JSON.stringify({streak:newStreak,lastDate:today}));
+}
+
+/* ══ CLOUD ══════════════════════════════════════════ */
+async function loadVocabProgress(){
+  if(!currentUser) return;
+  try{
+    const{data,error}=await sb.from('vocab_progress').select('*').eq('user_id',currentUser.id);
+    if(!error&&data) vocabWords=data;
+  }catch(e){console.error('Load vocab failed',e);}
+  // Always auto-sync after loading so new Kamus saves appear immediately
+  await syncFromKamus(true);
+}
+
+async function saveWordProgress(word){
+  if(!currentUser) return;
+  try{
+    await sb.from('vocab_progress').upsert({user_id:currentUser.id,...word},{onConflict:'user_id,word'});
+  }catch(e){console.error('Save progress failed',e);}
+}
+
+// silent=true skips toast on "already up to date" and hides button state
+async function syncFromKamus(silent=false){
+  const t=UI[lang];
+  if(!currentUser){if(!silent)showToast(t.syncLogin);return;}
+  const btn=document.getElementById('syncBtn');
+  if(btn&&!silent){btn.textContent=t.syncing;btn.disabled=true;}
+  try{
+    const{data:saved,error}=await sb.from('saved_words').select('*').eq('user_id',currentUser.id);
+    if(error||!saved){if(btn&&!silent){btn.textContent=t.syncBtn;btn.disabled=false;}return;}
+
+    const existing=new Set(vocabWords.map(w=>w.word));
+    const toAdd=saved.filter(s=>!existing.has(s.word));
+
+    if(toAdd.length>0){
+      const today=new Date().toISOString().split('T')[0];
+      // Fetch all definitions in parallel
+      const fetched=await Promise.all(toAdd.map(async s=>{
+        let phonetic='',definition='';
+        try{
+          const res=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(s.word)}`);
+          if(res.ok){
+            const d=await res.json();
+            phonetic=d[0]?.phonetic||d[0]?.phonetics?.find(p=>p.text)?.text||'';
+            definition=d[0]?.meanings?.[0]?.definitions?.[0]?.definition||'';
+          }
+        }catch(e){}
+        return{word:s.word,phonetic,definition,ease_factor:2.5,interval_days:1,repetitions:0,next_review:today,total_reviews:0};
+      }));
+
+      // Batch upsert all at once
+      const rows=fetched.map(w=>({user_id:currentUser.id,...w}));
+      await sb.from('vocab_progress').upsert(rows,{onConflict:'user_id,word'});
+      vocabWords=[...vocabWords,...rows];
+      showToast(t.syncDone(fetched.length));
+    }else{
+      if(!silent) showToast(t.syncNone);
+    }
+
+    if(btn&&!silent){btn.textContent=t.syncBtn;btn.disabled=false;}
+    renderCurrentPage();
+  }catch(e){
+    console.error('Sync failed',e);
+    if(btn&&!silent){btn.textContent=t.syncBtn;btn.disabled=false;}
+  }
+}
+
+/* ══ HOME ═══════════════════════════════════════════ */
+function renderHome(){
+  const t=UI[lang];
+  const c=document.getElementById('homeContent');
+  if(!currentUser){
+    c.innerHTML=renderAuth();
+    return;
+  }
+  const streak=getStreak();
+  const due=vocabWords.filter(isDue);
+  const mastered=vocabWords.filter(isMastered);
+
+  c.innerHTML=`
+    <div class="streak-banner">
+      <div class="streak-num">🔥${streak}</div>
+      <div class="streak-info">
+        <div class="streak-title">${streak} ${t.streakLbl}</div>
+        <div class="streak-sub">${t.streakSub}</div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--brand)">${vocabWords.length}</div><div class="stat-lbl">${t.statTotal}</div></div>
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--success)">${mastered.length}</div><div class="stat-lbl">${t.statMastered}</div></div>
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--warn)">${due.length}</div><div class="stat-lbl">${t.statDue}</div></div>
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--info)">${streak}</div><div class="stat-lbl">${t.statStreak}</div></div>
+    </div>
+    <div class="due-card lg2" style="border-radius:var(--r-2xl)">
+      <div class="due-info">
+        <div class="due-count">${due.length}</div>
+        <div class="due-lbl">${t.dueTitle}</div>
+        <div class="due-sub">${t.dueSub}</div>
+      </div>
+      <button class="study-btn" onclick="startQuiz()" ${due.length===0?'disabled':''}>
+        ${due.length===0?t.noStudy:t.studyBtn}
+      </button>
+    </div>
+    ${vocabWords.length===0?`<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">${t.noWords}</div><div class="empty-sub">${t.noWordsSub}</div></div>`:''}
+    <div style="text-align:center;padding:clamp(14px,4vw,20px) 0 0;font-size:clamp(10px,2.5vw,12px);color:var(--text3);font-family:var(--mono)">Vocab v1.0 · JondriDev · 2026</div>
+  `;
+}
+
+/* ══ LIBRARY ════════════════════════════════════════ */
+function renderLibrary(){
+  const t=UI[lang];
+  const list=document.getElementById('libraryList');
+  if(!currentUser){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">🔐</div><div class="empty-title">${t.noWords}</div><div class="empty-sub">${t.noWordsSub}</div></div>`;
+    return;
+  }
+  if(!vocabWords.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">${t.noWords}</div><div class="empty-sub">${t.noWordsSub}</div></div>`;
+    return;
+  }
+  const today=new Date().toISOString().split('T')[0];
+  const sorted=[...vocabWords].sort((a,b)=>{
+    if(isDue(a)&&!isDue(b)) return -1;
+    if(!isDue(a)&&isDue(b)) return 1;
+    return a.word.localeCompare(b.word);
+  });
+  list.innerHTML=sorted.map(w=>{
+    let badge='';
+    if(isMastered(w)) badge=`<span class="interval-badge" style="background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.25);color:var(--success)">${t.masteredBadge}</span>`;
+    else if(w.total_reviews===0) badge=`<span class="new-badge">${t.newBadge}</span>`;
+    else if(isDue(w)) badge=`<span class="due-badge">⏰ DUE</span>`;
+    else badge=`<span class="interval-badge">${t.intervalF(w.interval_days)}</span>`;
+
+    return`<div class="word-item lg">
+      <div class="word-left">
+        <div class="word-txt">${w.word}</div>
+        ${w.phonetic?`<div class="word-ph">${w.phonetic}</div>`:''}
+        ${w.definition?`<div class="word-def">${w.definition}</div>`:'<div class="word-def" style="color:var(--text3);font-style:italic">No definition cached</div>'}
+      </div>
+      <div class="word-right">${badge}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══ QUIZ ═══════════════════════════════════════════ */
+function startQuiz(){
+  gotoPage('Quiz',2);
+}
+
+function renderQuizPage(){
+  const t=UI[lang];
+  const c=document.getElementById('quizContent');
+  if(!currentUser){
+    c.innerHTML=renderAuth();
+    return;
+  }
+  const due=vocabWords.filter(w=>isDue(w)&&w.definition);
+  if(!due.length){
+    c.innerHTML=`
+      <div class="quiz-card lg2" style="margin-top:clamp(16px,5vw,32px)">
+        <div class="empty">
+          <div class="empty-icon">🎉</div>
+          <div class="empty-title">${t.noQuiz}</div>
+          <div class="empty-sub">${t.noQuizSub}</div>
+        </div>
+      </div>`;
+    return;
+  }
+  if(quizQueue.length===0){
+    // Start new session
+    quizQueue=[...due].sort(()=>Math.random()-0.5).slice(0,Math.min(due.length,20));
+    quizIndex=0;
+    quizScore=0;
+    quizTotal=quizQueue.length;
+  }
+  renderQuizQuestion(c,t);
+}
+
+function renderQuizQuestion(c,t){
+  if(quizIndex>=quizQueue.length){
+    renderQuizComplete(c,t);
+    return;
+  }
+  const current=quizQueue[quizIndex];
+  const total=quizQueue.length;
+  const pct=Math.round((quizIndex/total)*100);
+
+  // Build options: correct + 3 random wrong from other words with definitions
+  const others=vocabWords.filter(w=>w.word!==current.word&&w.definition);
+  const shuffled=[...others].sort(()=>Math.random()-0.5).slice(0,3);
+  const options=[...shuffled.map(w=>w.definition),current.definition].sort(()=>Math.random()-0.5);
+  const correctIdx=options.indexOf(current.definition);
+
+  quizAnswered=false;
+
+  c.innerHTML=`
+    <div class="quiz-progress">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="sec-label" style="margin:0">${t.questionOf(quizIndex+1,total)}</span>
+        <span class="sec-label" style="margin:0">⭐ ${quizScore}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="quiz-card lg2">
+      <div class="quiz-word">${current.word}</div>
+      ${current.phonetic?`<div class="quiz-ph">${current.phonetic}</div>`:''}
+    </div>
+    <div class="options-grid" id="optionsGrid">
+      ${options.map((opt,i)=>`
+        <button class="option-btn lg" style="border:1px solid var(--lg-b);color:var(--text)"
+          onclick="selectOption(this,${i},${correctIdx})">
+          ${opt}
+        </button>`).join('')}
+    </div>
+    <div class="rating-wrap" id="ratingWrap">
+      <div class="rating-title">${t.rateTitle}</div>
+      <div class="rating-btns">
+        <button class="rating-btn" style="background:rgba(248,113,113,0.15);color:var(--danger)" onclick="rateWord(0)">${t.rateBlackout}</button>
+        <button class="rating-btn" style="background:rgba(251,191,36,0.15);color:var(--warn)" onclick="rateWord(2)">${t.rateHard}</button>
+        <button class="rating-btn" style="background:rgba(56,189,248,0.15);color:var(--info)" onclick="rateWord(3)">${t.rateGood}</button>
+        <button class="rating-btn" style="background:rgba(74,222,128,0.15);color:var(--success)" onclick="rateWord(5)">${t.rateEasy}</button>
+      </div>
+    </div>`;
+}
+
+function selectOption(btn,selected,correct){
+  if(quizAnswered) return;
+  quizAnswered=true;
+  const btns=document.querySelectorAll('.option-btn');
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correct) b.classList.add('correct');
+    else if(i===selected&&selected!==correct) b.classList.add('wrong');
+  });
+  if(selected===correct) quizScore++;
+  document.getElementById('ratingWrap').style.display='block';
+}
+
+async function rateWord(quality){
+  const current=quizQueue[quizIndex];
+  const idx=vocabWords.findIndex(w=>w.word===current.word);
+  if(idx>-1){
+    const updated=sm2(vocabWords[idx],quality);
+    vocabWords[idx]={...vocabWords[idx],...updated};
+    await saveWordProgress(vocabWords[idx]);
+  }
+  markStudiedToday();
+  quizIndex++;
+  const t=UI[lang];
+  const c=document.getElementById('quizContent');
+  renderQuizQuestion(c,t);
+}
+
+function renderQuizComplete(c,t){
+  const sessionTotal=quizTotal;
+  const sessionScore=quizScore;
+  quizQueue=[];quizIndex=0;quizScore=0;quizTotal=0;
+  const stillDue=vocabWords.filter(w=>isDue(w)&&w.definition).length;
+  c.innerHTML=`
+    <div class="quiz-complete quiz-card lg2" style="margin-top:clamp(16px,5vw,32px)">
+      <div class="complete-emoji">${sessionScore>=Math.ceil(sessionTotal*0.8)?'🎉':'💪'}</div>
+      <div class="complete-title">${t.quizDone}</div>
+      <div class="complete-sub">${t.quizDoneSub(sessionScore,sessionTotal)}</div>
+      <div class="complete-stats">
+        <div><div class="c-stat-val">${sessionScore}</div><div class="c-stat-lbl">Correct</div></div>
+        <div><div class="c-stat-val">${getStreak()}</div><div class="c-stat-lbl">${t.statStreak}</div></div>
+        <div><div class="c-stat-val">${vocabWords.filter(isMastered).length}</div><div class="c-stat-lbl">${t.statMastered}</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto">
+        ${stillDue>0?`<button onclick="startQuizFresh()" style="font-family:var(--font);font-size:14px;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--brand3));border:none;border-radius:var(--r-xl);padding:14px;color:white;cursor:pointer;box-shadow:0 4px 20px rgba(244,114,182,0.30)">${t.again}</button>`:''}
+        <button onclick="gotoPage('Home',0)" style="font-family:var(--font);font-size:14px;font-weight:700;background:var(--lg-bg);border:1px solid var(--lg-b);border-radius:var(--r-xl);padding:13px;color:var(--text);cursor:pointer;backdrop-filter:blur(20px)">${t.backHome}</button>
+      </div>
+    </div>`;
+}
+
+function startQuizFresh(){
+  quizQueue=[];quizIndex=0;quizScore=0;quizTotal=0;
+  renderQuizPage();
+}
+
+/* ══ AUTH ═══════════════════════════════════════════ */
+function renderAuth(){
+  const t=UI[lang];
+  return`<div class="auth-wrap">
+    <div class="auth-title">${authMode==='login'?t.loginTitle:t.signupTitle}</div>
+    <div class="auth-sub">${authMode==='login'?t.loginSub:t.signupSub}</div>
+    <div class="auth-tabs">
+      <button class="auth-tab ${authMode==='login'?'active':''}" onclick="setAuthMode('login')">${t.loginTab}</button>
+      <button class="auth-tab ${authMode==='signup'?'active':''}" onclick="setAuthMode('signup')">${t.signupTab}</button>
+    </div>
+    <button class="google-btn lg" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      ${t.googleBtn}
+    </button>
+    <div class="auth-divider"><div class="auth-divider-line"></div><div class="auth-divider-txt">OR</div><div class="auth-divider-line"></div></div>
+    <div class="auth-error" id="authError"></div>
+    ${authMode==='signup'?`<input class="auth-input" id="authName" type="text" placeholder="${t.namePH}" autocomplete="name"/>`:''}
+    <input class="auth-input" id="authEmail" type="email" placeholder="${t.emailPH}" autocomplete="email"/>
+    <input class="auth-input" id="authPass" type="password" placeholder="${t.passPH}" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')submitAuth()"/>
+    <button class="auth-btn" id="authSubmitBtn" onclick="submitAuth()">${authMode==='login'?t.loginBtn:t.signupBtn}</button>
+    <div class="auth-note">${authMode==='login'?t.loginNote:t.signupNote} <a onclick="setAuthMode(authMode==='login'?'signup':'login')">${authMode==='login'?t.signupTab:t.loginTab}</a></div>
+  </div>`;
+}
+
+function setAuthMode(m){authMode=m;renderCurrentPage();}
+
+async function submitAuth(){
+  if(authLoading) return;
+  const email=document.getElementById('authEmail')?.value.trim();
+  const pass=document.getElementById('authPass')?.value.trim();
+  if(!email||!pass) return showAuthError('Please fill all fields');
+  authLoading=true;
+  const btn=document.getElementById('authSubmitBtn');
+  if(btn) btn.textContent='...';
+  let error;
+  if(authMode==='signup'){
+    const res=await sb.auth.signUp({email,password:pass});
+    error=res.error;
+    if(!error){const res2=await sb.auth.signInWithPassword({email,password:pass});error=res2.error;}
+  }else{
+    const res=await sb.auth.signInWithPassword({email,password:pass});
+    error=res.error;
+  }
+  authLoading=false;
+  if(error){
+    showAuthError(error.message);
+    if(btn) btn.textContent=authMode==='login'?UI[lang].loginBtn:UI[lang].signupBtn;
+  }else{
+    const{data}=await sb.auth.getSession();
+    currentUser=data?.session?.user||null;
+    await loadVocabProgress();
+    renderCurrentPage();
+  }
+}
+
+async function signInWithGoogle(){
+  await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  currentUser=null;vocabWords=[];quizQueue=[];
+  renderCurrentPage();
+}
+
+function showAuthError(msg){
+  const el=document.getElementById('authError');
+  if(el){el.textContent=msg;el.style.display='block';}
+}
+
+/* ══ PROFILE ════════════════════════════════════════ */
+function renderProfile(){
+  const t=UI[lang];
+  const c=document.getElementById('profileContent');
+  if(!currentUser){
+    c.innerHTML=`<div style="padding:clamp(16px,5vw,24px) clamp(12px,4vw,20px);max-width:560px;margin:0 auto">${renderAuth()}</div>`;
+    return;
+  }
+  const name=currentUser.user_metadata?.name||currentUser.user_metadata?.full_name||currentUser.email?.split('@')[0]||'User';
+  const avatar=currentUser.user_metadata?.avatar_url;
+  const streak=getStreak();
+  c.innerHTML=`<div class="profile-wrap">
+    <div class="profile-avatar" style="${avatar?`background:url(${avatar}) center/cover;font-size:0`:''}">${avatar?'':'👤'}</div>
+    <div class="profile-name">${name}</div>
+    <div class="profile-email">${currentUser.email} <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:rgba(244,114,182,0.12);color:var(--brand);border:1px solid rgba(244,114,182,0.25);margin-left:4px;-webkit-text-fill-color:var(--brand)">☁️ ${t.cloudSynced}</span></div>
+    <div class="stat-grid" style="margin-bottom:clamp(16px,4vw,22px)">
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--brand)">${vocabWords.length}</div><div class="stat-lbl">${t.statTotal}</div></div>
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--success)">${vocabWords.filter(isMastered).length}</div><div class="stat-lbl">${t.statMastered}</div></div>
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--warn)">${vocabWords.filter(isDue).length}</div><div class="stat-lbl">${t.statDue}</div></div>
+      <div class="stat-card lg"><div class="stat-val" style="color:var(--info)">${streak}</div><div class="stat-lbl">${t.statStreak}</div></div>
+    </div>
+    <div class="sec-label">${t.settingsLabel}</div>
+    <div class="setting-row lg" style="margin-bottom:6px">
+      <div><div class="setting-label">${t.settingLangLbl}</div><div class="setting-desc">${t.settingLangDesc}</div></div>
+      <div class="lang-toggle">
+        <button class="lang-btn ${lang==='en'?'active':''}" onclick="setLang('en')">EN</button>
+        <button class="lang-btn ${lang==='id'?'active':''}" onclick="setLang('id')">ID</button>
+      </div>
+    </div>
+    <div class="setting-row lg" style="margin-bottom:6px">
+      <div><div class="setting-label">${t.settingThemeLbl}</div><div class="setting-desc">${t.settingThemeDesc}</div></div>
+      <button class="toggle" onclick="toggleTheme()"></button>
+    </div>
+    <div class="sec-label" style="margin-top:20px">${t.ecoLabel}</div>
+    <div class="lg" style="border-radius:var(--r-xl);padding:clamp(12px,3vw,16px);margin-bottom:14px">
+      <div style="font-size:clamp(11px,2.5vw,13px);color:var(--text2);margin-bottom:10px">${t.ecoDesc}</div>
+      <div>
+        <span class="eco-chip" style="color:#4ade80;border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.08)">💰 Finance</span>
+        <span class="eco-chip" style="color:#38bdf8;border-color:rgba(56,189,248,0.3);background:rgba(56,189,248,0.08)">📖 Kamus</span>
+        <span class="eco-chip" style="color:var(--brand);border-color:rgba(244,114,182,0.3);background:rgba(244,114,182,0.08)">🧠 Vocab ✓</span>
+        <span class="eco-chip" style="color:#fb923c;border-color:rgba(251,146,60,0.3);background:rgba(251,146,60,0.08)">📄 Reader</span>
+      </div>
+    </div>
+    <button onclick="logout()" style="width:100%;font-family:var(--font);font-size:clamp(12px,3vw,14px);font-weight:700;background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.22);border-radius:var(--r-lg);padding:clamp(11px,3vw,14px);color:var(--danger);cursor:pointer;margin-bottom:clamp(14px,4vw,22px);transition:all 0.2s">
+      ${t.logoutBtn}
+    </button>
+    <div style="text-align:center;padding:0 0 clamp(14px,4vw,20px);font-size:clamp(10px,2.5vw,12px);color:var(--text3);font-family:var(--mono)">Vocab v1.0 · JondriDev · 2026</div>
+  </div>`;
+}
+
+/* ══ TOAST ══════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ══ INIT ═══════════════════════════════════════════ */
+async function init(){
+  const st=localStorage.getItem('vocab_theme');
+  if(st) document.documentElement.setAttribute('data-theme',st);
+  else document.documentElement.setAttribute('data-theme','light');
+  applyLang();
+  const{data}=await sb.auth.getSession();
+  if(data?.session?.user){
+    currentUser=data.session.user;
+    await loadVocabProgress();
+  }
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_OUT'){currentUser=null;vocabWords=[];renderCurrentPage();return;}
+    if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='INITIAL_SESSION'){
+      const newUser=session?.user||null;
+      if(newUser&&(!currentUser||currentUser.id!==newUser.id)){
+        currentUser=newUser;
+        await loadVocabProgress();
+      }
+    }
+    renderCurrentPage();
+  });
+  renderHome();
+}
+init();
+</script>
+</body>
+</html>
