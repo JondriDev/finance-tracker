@@ -8,8 +8,6 @@
 <link rel="manifest" href="manifest.json">
 <title>Finance | JondriDev</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
   --brand-primary: #4ade80; --brand-secondary: #22c55e;
@@ -46,20 +44,22 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-display); background: var(--gradient-bg); background-attachment: fixed; color: var(--text-primary); min-height: 100vh; transition: background 0.4s ease, color 0.3s ease; padding-bottom: 80px; }
 
-/* ══ LIQUID GLASS SYSTEM ══ */
-.lg{
-  background:var(--lg-bg); backdrop-filter:blur(32px) saturate(200%); -webkit-backdrop-filter:blur(32px) saturate(200%);
-  border:1px solid var(--lg-b); box-shadow:var(--lg-sh); position:relative;isolation:isolate;
+/* ══ LIQUID GLASS SYSTEM (HARDWARE ACCELERATED) ══ */
+.lg {
+  background: var(--lg-bg); backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid var(--lg-b); box-shadow: var(--lg-sh); position: relative; isolation: isolate;
+  transform: translateZ(0);
 }
-.lg::after{ content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 50%);pointer-events:none;z-index:0; }
-.lg>*{position:relative;z-index:1;}
+.lg::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(145deg, var(--lg-spec) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+.lg > * { position: relative; z-index: 1; }
 
-.lg2{
-  background:var(--lg-bg-s); backdrop-filter:blur(48px) saturate(220%); -webkit-backdrop-filter:blur(48px) saturate(220%);
-  border:1px solid var(--lg-b2); box-shadow:var(--lg-sh2); position:relative;isolation:isolate;
+.lg2 {
+  background: var(--lg-bg-s); backdrop-filter: blur(48px) saturate(220%); -webkit-backdrop-filter: blur(48px) saturate(220%);
+  border: 1px solid var(--lg-b2); box-shadow: var(--lg-sh2); position: relative; isolation: isolate;
+  transform: translateZ(0);
 }
-.lg2::after{ content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 40%);pointer-events:none;z-index:0; }
-.lg2>*{position:relative;z-index:1;}
+.lg2::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(145deg, var(--lg-spec) 0%, transparent 40%); pointer-events: none; z-index: 0; }
+.lg2 > * { position: relative; z-index: 1; }
 
 /* COMPONENTS */
 .card { border-radius: var(--radius-lg); padding: var(--space-md); transition: all 0.25s ease; }
@@ -224,6 +224,9 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 <div class="toast lg2" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 /* ══ PWA ═══════════════════════════════════════════ */
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); }); }
@@ -276,10 +279,8 @@ const UI = {
 
 /* ══ AUTO FORMAT INPUT ═════════════════════════════ */
 document.getElementById('amount').addEventListener('input', function(e) {
-  // Remove anything that isn't a number
   let val = this.value.replace(/\D/g, '');
   if (val) {
-    // Format with periods for Indonesian locale styling
     this.value = parseInt(val, 10).toLocaleString('id-ID');
   } else {
     this.value = '';
@@ -460,7 +461,6 @@ function handleButtonClick(type) {
 
 async function saveTransaction() {
   const desc = document.getElementById('description').value;
-  // Strip out non-digit characters before parsing
   const rawAmtStr = document.getElementById('amount').value.replace(/\D/g, '');
   const amt = parseFloat(rawAmtStr);
   const date = document.getElementById('date').value;
@@ -487,11 +487,19 @@ async function saveTransaction() {
     }
   }
 
-  document.getElementById('description').value = ''; document.getElementById('amount').value = '';
+  // --- UX IMPROVEMENTS ---
+  document.getElementById('description').value = ''; 
+  document.getElementById('amount').value = '';
+  document.getElementById('date').valueAsDate = new Date(); // Reset date to today
+  
   document.getElementById('categoryGroup').style.display = 'none'; pendingType = null;
   document.getElementById('incomeBtn').style.opacity = '1'; document.getElementById('expenseBtn').style.opacity = '1';
   document.getElementById('saveTransactionBtn').textContent = UI[lang].save;
   
+  if (document.activeElement) {
+      document.activeElement.blur(); // Force mobile keyboard to close
+  }
+
   saveLocal(); recalculateBalance(); updateDisplay(); showToast(UI[lang].toastSave);
 }
 
@@ -499,7 +507,6 @@ function editTransaction(id) {
   const t = transactions.find(t => t.id === id); if (!t) return;
   editingId = id;
   document.getElementById('description').value = t.description;
-  // Format the existing number so it looks right when editing
   document.getElementById('amount').value = t.amount.toLocaleString('id-ID');
   document.getElementById('date').value = t.date;
   handleButtonClick(t.type);
