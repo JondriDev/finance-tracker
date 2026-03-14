@@ -23,7 +23,6 @@
   --bg-base: #f0fdf4; --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --text-inverse: #f0f2f8;
   --gradient-bg: radial-gradient(ellipse at 20% 20%, rgba(74,222,128,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(34,197,94,0.12) 0%, transparent 60%), #f0fdf4;
   --chart-grid: #eff3f4;
-  /* FINANCE LIQUID GLASS - LIGHT */
   --lg-bg:rgba(255,255,255,0.42); --lg-bg-h:rgba(255,255,255,0.60);
   --lg-bg-s:rgba(255,255,255,0.68); --lg-bg-nav:rgba(255,255,255,0.55);
   --lg-b:rgba(255,255,255,0.78); --lg-b2:rgba(255,255,255,0.92);
@@ -36,7 +35,6 @@
   --bg-base: #07080f; --text-primary: #f0f2f8; --text-secondary: #94a3b8; --text-muted: #4b5563; --text-inverse: #07080f;
   --gradient-bg: radial-gradient(ellipse at 20% 20%, rgba(74,222,128,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(34,197,94,0.08) 0%, transparent 60%), #07080f;
   --chart-grid: #333333;
-  /* FINANCE LIQUID GLASS - DARK */
   --lg-bg:rgba(20,40,30,0.50); --lg-bg-h:rgba(30,55,40,0.60);
   --lg-bg-s:rgba(40,70,50,0.65); --lg-bg-nav:rgba(10,25,15,0.75);
   --lg-b:rgba(74,222,128,0.12); --lg-b2:rgba(74,222,128,0.22);
@@ -50,33 +48,17 @@ body { font-family: var(--font-display); background: var(--gradient-bg); backgro
 
 /* ══ LIQUID GLASS SYSTEM ══ */
 .lg{
-  background:var(--lg-bg);
-  backdrop-filter:blur(32px) saturate(200%);
-  -webkit-backdrop-filter:blur(32px) saturate(200%);
-  border:1px solid var(--lg-b);
-  box-shadow:var(--lg-sh);
-  position:relative;isolation:isolate;
+  background:var(--lg-bg); backdrop-filter:blur(32px) saturate(200%); -webkit-backdrop-filter:blur(32px) saturate(200%);
+  border:1px solid var(--lg-b); box-shadow:var(--lg-sh); position:relative;isolation:isolate;
 }
-.lg::after{
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 50%);
-  pointer-events:none;z-index:0;
-}
+.lg::after{ content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 50%);pointer-events:none;z-index:0; }
 .lg>*{position:relative;z-index:1;}
 
 .lg2{
-  background:var(--lg-bg-s);
-  backdrop-filter:blur(48px) saturate(220%);
-  -webkit-backdrop-filter:blur(48px) saturate(220%);
-  border:1px solid var(--lg-b2);
-  box-shadow:var(--lg-sh2);
-  position:relative;isolation:isolate;
+  background:var(--lg-bg-s); backdrop-filter:blur(48px) saturate(220%); -webkit-backdrop-filter:blur(48px) saturate(220%);
+  border:1px solid var(--lg-b2); box-shadow:var(--lg-sh2); position:relative;isolation:isolate;
 }
-.lg2::after{
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 40%);
-  pointer-events:none;z-index:0;
-}
+.lg2::after{ content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,var(--lg-spec) 0%,transparent 40%);pointer-events:none;z-index:0; }
 .lg2>*{position:relative;z-index:1;}
 
 /* COMPONENTS */
@@ -147,7 +129,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .google-btn:hover { background:var(--lg-bg-h); transform:translateY(-1px); }
 .auth-error { font-size:11px;color:var(--brand-danger);margin-bottom:12px;padding:8px;background:rgba(248,113,113,0.1);border-radius:var(--radius-sm);display:none; }
 
-.toast{ position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);padding:10px 20px;border-radius:var(--radius-full);font-size:13px;font-weight:700;z-index:900;opacity:0;transition:all 0.3s;pointer-events:none; }
+.toast{ position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);padding:10px 20px;border-radius:var(--radius-full);font-size:13px;font-weight:700;z-index:900;opacity:0;transition:all 0.3s;pointer-events:none; background: var(--lg-bg-s); border: 1px solid var(--lg-b2); backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); color: var(--text-primary); box-shadow: var(--lg-sh2); }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
@@ -195,7 +177,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
         </div>
         <div class="form-group">
           <label id="uiAmt">Amount (IDR)</label>
-          <input type="number" class="input" id="amount" placeholder="150000" required>
+          <input type="number" class="input" id="amount" placeholder="150000" min="1" required>
         </div>
         <div class="form-group">
           <label id="uiDate">Date</label>
@@ -258,9 +240,10 @@ let currentUser = null;
 let balance = 0, pendingType = null, currentFilter = 'all', editingId = null;
 let chart = null, authMode = 'login', authLoading = false;
 
+// ADDED INITIAL BALANCE AND ADJUSTMENT TO CATEGORIES
 const categories = {
-  income: ['Salary', 'Freelance', 'Gift', 'Investment', 'Other'],
-  expense: ['Food', 'Wifi', 'Transportation', 'Electricity', 'Skincare', 'Other']
+  income: ['Initial Balance', 'Salary', 'Freelance', 'Gift', 'Investment', 'Other'],
+  expense: ['Adjustment', 'Food', 'Wifi', 'Transportation', 'Electricity', 'Skincare', 'Other']
 };
 
 const UI = {
@@ -272,7 +255,7 @@ const UI = {
     filtAll: 'All', filtMo: 'Month', emptyTx: 'No transactions found.', emptyCh: 'Add data to view chart',
     hlthGood: 'HEALTHY', hlthBad: 'WARNING', hlthNo: 'NO DATA',
     hlthMsgG: (v) => `You saved IDR ${v}`, hlthMsgB: (v) => `Spent IDR ${v} more than earned.`, hlthMsgN: 'Add transactions to see health.',
-    toastSave: 'Saved', toastDel: 'Deleted',
+    toastSave: 'Saved', toastDel: 'Deleted', toastFill: 'Please fill all fields correctly (amount > 0)',
     loginTab: 'Sign In', signupTab: 'Sign Up', googleBtn: 'Continue with Google',
     emailPH: 'Email address', passPH: 'Password', loginBtn: 'Sign In', signupBtn: 'Create Account',
     welcome: 'Welcome back', logoutBtn: 'Sign Out'
@@ -285,7 +268,7 @@ const UI = {
     filtAll: 'Semua', filtMo: 'Bulan', emptyTx: 'Tidak ada transaksi.', emptyCh: 'Tambah data untuk melihat grafik',
     hlthGood: 'SEHAT', hlthBad: 'AWAS', hlthNo: 'KOSONG',
     hlthMsgG: (v) => `Anda menghemat IDR ${v}`, hlthMsgB: (v) => `Pengeluaran lebih IDR ${v}.`, hlthMsgN: 'Tambah transaksi untuk melihat status.',
-    toastSave: 'Tersimpan', toastDel: 'Dihapus',
+    toastSave: 'Tersimpan', toastDel: 'Dihapus', toastFill: 'Harap isi semua kolom dengan benar (jumlah > 0)',
     loginTab: 'Masuk', signupTab: 'Daftar', googleBtn: 'Lanjutkan dengan Google',
     emailPH: 'Alamat email', passPH: 'Kata sandi', loginBtn: 'Masuk', signupBtn: 'Buat Akun',
     welcome: 'Selamat datang', logoutBtn: 'Keluar'
@@ -451,7 +434,16 @@ function handleButtonClick(type) {
   document.getElementById('categoryGroup').style.display = 'block';
   document.getElementById('categoryLabel').textContent = UI[lang][type==='income'?'catInc':'catExp'];
   const catSelect = document.getElementById('category');
-  catSelect.innerHTML = '<option value="">Select...</option>' + categories[type].map(c => `<option value="${c}">${c}</option>`).join('');
+  
+  // Automatically switch categories to English or Indonesian representation in UI
+  const isID = lang === 'id';
+  catSelect.innerHTML = '<option value="">Select...</option>' + categories[type].map(c => {
+      let displayName = c;
+      if (isID && c === 'Initial Balance') displayName = 'Saldo Awal';
+      if (isID && c === 'Adjustment') displayName = 'Penyesuaian';
+      return `<option value="${c}">${displayName}</option>`;
+  }).join('');
+  
   document.getElementById('incomeBtn').style.opacity = type === 'income' ? '1' : '0.5';
   document.getElementById('expenseBtn').style.opacity = type === 'expense' ? '1' : '0.5';
 }
@@ -461,7 +453,12 @@ async function saveTransaction() {
   const amt = parseFloat(document.getElementById('amount').value);
   const date = document.getElementById('date').value;
   const cat = document.getElementById('category').value;
-  if (!desc || isNaN(amt) || !cat || !date || !pendingType) return alert('Fill all fields');
+  
+  // BUG FIX: Prevent negative amounts or 0
+  if (!desc || isNaN(amt) || amt <= 0 || !cat || !date || !pendingType) {
+      showToast(UI[lang].toastFill);
+      return;
+  }
 
   const tObj = { type: pendingType, description: desc, amount: amt, category: cat, date: date };
 
@@ -539,11 +536,15 @@ function updateDisplay() {
 
   const list = document.getElementById('transactionsList');
   if(!filtered.length) list.innerHTML = `<div class="empty-state">${t.emptyTx}</div>`;
-  else list.innerHTML = filtered.map(tx => `
+  else list.innerHTML = filtered.map(tx => {
+    let catName = tx.category;
+    if(lang === 'id' && catName === 'Initial Balance') catName = 'Saldo Awal';
+    if(lang === 'id' && catName === 'Adjustment') catName = 'Penyesuaian';
+    return `
     <div class="transaction-item">
       <div class="transaction-left">
         <div class="transaction-title">${tx.description.replace(/</g,'&lt;')}</div>
-        <div class="transaction-meta">${tx.category} • ${new Date(tx.date).toLocaleDateString()}</div>
+        <div class="transaction-meta">${catName} • ${new Date(tx.date).toLocaleDateString()}</div>
       </div>
       <div class="transaction-right">
         <div class="transaction-amount ${tx.type==='income'?'val-income':'val-expense'}">${tx.type==='income'?'+':'-'}${fmt(tx.amount)}</div>
@@ -552,7 +553,8 @@ function updateDisplay() {
           <button class="btn btn-sm btn-danger" style="color:white" onclick="deleteTransaction(${tx.id})">✕</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`
+  }).join('');
 
   updateChart(filtered, t);
 }
@@ -560,13 +562,27 @@ function updateDisplay() {
 function updateChart(filtered, t) {
   const ctx = document.getElementById('spendingChart').getContext('2d');
   const empty = document.getElementById('chartEmptyState');
-  if (!filtered.length) { document.getElementById('spendingChart').style.display = 'none'; empty.textContent = t.emptyCh; empty.style.display = 'block'; return; }
+  
+  // Filter out Initial Balance and Adjustment for the chart rendering only
+  const chartData = filtered.filter(tx => tx.category !== 'Initial Balance' && tx.category !== 'Adjustment');
+  
+  if (!chartData.length) { document.getElementById('spendingChart').style.display = 'none'; empty.textContent = t.emptyCh; empty.style.display = 'block'; return; }
   document.getElementById('spendingChart').style.display = 'block'; empty.style.display = 'none';
 
   const incData = {}, expData = {};
-  filtered.forEach(tx => tx.type === 'income' ? incData[tx.category] = (incData[tx.category] || 0) + tx.amount : expData[tx.category] = (expData[tx.category] || 0) + tx.amount);
+  chartData.forEach(tx => {
+      let cat = tx.category;
+      tx.type === 'income' ? incData[cat] = (incData[cat] || 0) + tx.amount : expData[cat] = (expData[cat] || 0) + tx.amount;
+  });
   const cats = [...new Set([...Object.keys(incData), ...Object.keys(expData)])];
   
+  // Translate labels for the chart if in ID mode
+  const displayCats = cats.map(c => {
+      if(lang === 'id' && c === 'Initial Balance') return 'Saldo Awal';
+      if(lang === 'id' && c === 'Adjustment') return 'Penyesuaian';
+      return c;
+  });
+
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const textColor = isDark ? '#94a3b8' : '#475569';
   const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim();
@@ -575,7 +591,7 @@ function updateChart(filtered, t) {
   chart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: cats,
+      labels: displayCats,
       datasets: [
         { label: t.inc, data: cats.map(c => incData[c] || 0), backgroundColor: '#4ade80', borderRadius: 4 },
         { label: t.exp, data: cats.map(c => expData[c] || 0), backgroundColor: '#f87171', borderRadius: 4 }
